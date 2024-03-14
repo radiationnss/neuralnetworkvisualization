@@ -23,11 +23,16 @@ overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 overlay.fill((0, 0, 0, 0))  # Fill with transparent color
 
 # Create sliders
-sliders = [
-    Slider1((500, 80), (100, 10), 0.5, -1, 1),
-    Slider1((500, 100), (100, 10), 0.5, -1, 1),
-    Slider1((500, 120), (100, 10), 0.5, -1, 1),
-    Slider1((500, 140), (100, 10), 0.5, -1, 1)
+weights = [
+    Slider1((WIDTH - 80, 20), (100, 10), 0.5, -1, 1),
+    Slider1((WIDTH - 80, 40), (100, 10), 0.5, -1, 1),
+    Slider1((WIDTH - 80, 60), (100, 10), 0.5, -1, 1),
+    Slider1((WIDTH - 80, 80), (100, 10), 0.5, -1, 1)
+]
+
+biases = [
+    Slider1((WIDTH - 80, 120), (100, 10), 0.5, -1, 1),
+    Slider1((WIDTH - 80, 140), (100, 10), 0.5, -1, 1),
 ]
 
 # Function to draw the axes
@@ -48,7 +53,8 @@ def draw_axes():
     y_label_rect = y_label.get_rect(center=(30, 500))
     screen.blit(y_label, y_label_rect)
 
-prev_slider_values = None
+prev_weight_values = None
+prev_bias_values = None
 BLOCK_SIZE = 5
 
 # Main loop
@@ -64,24 +70,27 @@ while True:
             sys.exit()
 
     # Check if slider values have changed
-    slider_values = [slider.get_value() for slider in sliders]
-    if slider_values != prev_slider_values:
-        prev_slider_values = slider_values
+    if any(weight.dragging for weight in weights or bias in biases):
+        current_weight_values = [weight.get_value() for weight in weights]
+        current_bias_values = [bias.get_value() for bias in biases]
+        if current_weight_values != prev_weight_values or current_bias_values != prev_bias_values:
+            prev_weight_values = current_weight_values
+            prev_bias_values = current_bias_values
 
-        # Clear the overlay
-        overlay.fill((0, 0, 0, 0))
+            # Clear the overlay
+            overlay.fill((0, 0, 0, 0))
 
-        for x_block in range(0, WIDTH, BLOCK_SIZE):
-            for y_block in range(0, HEIGHT, BLOCK_SIZE):
-                # Calculate block coordinates
-                block_rect = pygame.Rect(x_block, y_block, BLOCK_SIZE, BLOCK_SIZE)
+            for x_block in range(0, WIDTH, BLOCK_SIZE):
+                for y_block in range(0, HEIGHT, BLOCK_SIZE):
+                    # Calculate block coordinates
+                    block_rect = pygame.Rect(x_block, y_block, BLOCK_SIZE, BLOCK_SIZE)
 
-                # Classify the block
-                result = Classify(x_block + BLOCK_SIZE // 2, y_block + BLOCK_SIZE // 2, *slider_values)
+                    # Classify the block
+                    result = Classify(x_block + BLOCK_SIZE // 2, y_block + BLOCK_SIZE // 2, *current_weight_values, *current_bias_values)
 
-                # Set color for the block based on classification result
-                color = RED if result == 1 else GREEN
-                pygame.draw.rect(overlay, color, block_rect)
+                    # Set color for the block based on classification result
+                    color = RED if result == 1 else GREEN
+                    pygame.draw.rect(overlay, color, block_rect)
     #this is for github
     # Blit the overlay and draw axes
     horizontal_translation = 50  # Adjust as needed
@@ -93,12 +102,19 @@ while True:
 
     # Blit the translated and flipped overlay
     screen.blit(translated_overlay, translated_overlay_rect)
-    for slider in sliders:
-        if slider.container_rect.collidepoint(mouse_pos) and mouse[0]:
-            slider.move_slider(mouse_pos)
-        slider.render(screen)
+    # screen.blit(overlay, (0, 0))
+    for weight in weights:
+        if weight.container_rect.collidepoint(mouse_pos) and mouse[0]:
+            weight.move_slider(mouse_pos)
+        weight.render(screen)
+        
+    for bias in biases:
+        if bias.container_rect.collidepoint(mouse_pos) and mouse[0]:
+            bias.move_slider(mouse_pos)
+        bias.render(screen)
 
     draw_axes()
 
     pygame.display.update()
     pygame.display.flip()
+

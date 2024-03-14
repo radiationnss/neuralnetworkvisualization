@@ -15,6 +15,8 @@ class Slider1:
         
         self.container_rect = pygame.Rect(self.slider_left_pos, self.slider_top_pos, self.size[0], self.size[1])
         self.button_rect = pygame.Rect(self.slider_left_pos + self.initial_val - 5, self.slider_top_pos, 10, self.size[1])
+        
+        self.dragging = False
     
     def render(self,screen):
         pygame.draw.rect(screen, "darkgray", self.container_rect)
@@ -22,6 +24,11 @@ class Slider1:
         
     def move_slider(self, mouse_pos):
         self.button_rect.centerx = mouse_pos[0]
+        self.dragging = True
+    
+    def dragging(self):
+        return self.dragging
+
         
     def get_value(self):
         val_range = self.slider_right_pos - self.slider_left_pos
