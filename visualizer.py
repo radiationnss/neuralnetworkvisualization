@@ -82,7 +82,7 @@ while True:
                 # Set color for the block based on classification result
                 color = RED if result == 1 else GREEN
                 pygame.draw.rect(overlay, color, block_rect)
-    #this is for gthub
+    #this is for github
     # Blit the overlay and draw axes
     horizontal_translation = 50  # Adjust as needed
     vertical_translation = -50  # Adjust as needed
