@@ -70,7 +70,7 @@ while True:
             sys.exit()
 
     # Check if slider values have changed
-    if any(weight.dragging for weight in weights or bias in biases):
+    if any(weight.dragging for weight in weights) or any(bias.dragging for bias in biases):
         current_weight_values = [weight.get_value() for weight in weights]
         current_bias_values = [bias.get_value() for bias in biases]
         if current_weight_values != prev_weight_values or current_bias_values != prev_bias_values:
@@ -79,6 +79,7 @@ while True:
 
             # Clear the overlay
             overlay.fill((0, 0, 0, 0))
+            # print(current_weight_values, current_bias_values)
 
             for x_block in range(0, WIDTH, BLOCK_SIZE):
                 for y_block in range(0, HEIGHT, BLOCK_SIZE):
@@ -91,7 +92,7 @@ while True:
                     # Set color for the block based on classification result
                     color = RED if result == 1 else GREEN
                     pygame.draw.rect(overlay, color, block_rect)
-    #this is for github
+    # this is for github
     # Blit the overlay and draw axes
     horizontal_translation = 50  # Adjust as needed
     vertical_translation = -50  # Adjust as needed
@@ -116,5 +117,3 @@ while True:
     draw_axes()
 
     pygame.display.update()
-    pygame.display.flip()
-
